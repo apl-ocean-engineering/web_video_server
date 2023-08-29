@@ -1,5 +1,5 @@
 #include "web_video_server/image_streamer.h"
-#include <cv_bridge/cv_bridge.h>
+#include <cv_bridge/cv_bridge.hpp>
 #include <iostream>
 
 namespace web_video_server
@@ -46,7 +46,12 @@ void ImageTransportImageStreamer::start()
       break;
     }
   }
-  image_sub_ = it_.subscribe(topic_, 1, &ImageTransportImageStreamer::imageCallback, this, &hints);
+  image_sub_ =
+      it_.subscribe(topic_, 1,
+                    std::bind(&ImageTransportImageStreamer::imageCallback, this,
+                              std::placeholders::_1),
+                    image_transport::ImageTransport::VoidPtr(), &hints,
+                    rclcpp::SubscriptionOptions());
 }
 
 void ImageTransportImageStreamer::initialize(const cv::Mat &)
